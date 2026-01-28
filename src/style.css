@@ -1,3 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+    --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --color-brand: #ff385c;
+    /* Airbnb-like red/rose */
+}
+
+body {
+    font-family: var(--font-sans);
+    @apply bg-gray-50 text-gray-900;
+}

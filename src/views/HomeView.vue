@@ -18,9 +18,9 @@ const categories = [
 </script>
 
 <template>
-  <div class="pt-16 pb-24">
+  <div class="pt-24 pb-24">
     <!-- Map Section -->
-    <section class="relative -mt-4">
+    <section class="relative px-6 -mt-2">
       <MapComponent :properties="properties" />
     </section>
 
