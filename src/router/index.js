@@ -20,16 +20,21 @@ const router = createRouter({
             component: () => import('../views/AddPropertyView.vue')
         },
         {
-            path: '/favorites',
-            name: 'favorites',
-            component: () => import('../views/FavoritesView.vue')
-        },
-        {
-            path: '/profile',
-            name: 'profile',
-            component: () => import('../views/ProfileView.vue')
-        }
-    ]
+      path: '/property/:id',
+      name: 'property-details',
+      component: () => import('../views/PropertyDetailsView.vue')
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('../views/FavoritesView.vue')
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue')
+    }
+  ]
 })
 
 export default router

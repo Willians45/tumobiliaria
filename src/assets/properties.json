@@ -4,119 +4,299 @@
     "title": "Apartamento de Lujo en Lechería",
     "price": 120000,
     "type": "sale",
-    "category": "apartment",
-    "location": { "lat": 10.198, "lng": -64.701 },
+    "category": "Apartamento",
+    "location": {
+      "lat": 10.198,
+      "lng": -64.701
+    },
     "address": "Residencias Puerto Banus, Lechería",
-    "features": { "bedrooms": 3, "bathrooms": 2, "area": 120, "parking": true, "pool": true, "view": "sea" },
-    "image": "https://placehold.co/600x400?text=Apto+Lecheria",
-    "uploader": { "name": "Global Real Estate", "type": "agency" }
+    "features": {
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "area": 120,
+      "parking": true,
+      "pool": true,
+      "view": "sea"
+    },
+    "image": "/placeholders/Apartamentos/imgi_29_D_NQ_NP_2X_704179-MLV99735662619_112025-F.webp",
+    "images": [
+      "/placeholders/Apartamentos/imgi_29_D_NQ_NP_2X_704179-MLV99735662619_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_31_D_NQ_NP_2X_878070-MLV99253422528_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_34_D_NQ_NP_2X_997762-MLV99253680310_112025-F.webp"
+    ],
+    "uploader": {
+      "name": "Global Real Estate",
+      "type": "agency"
+    }
   },
   {
     "id": 2,
     "title": "Casa Familiar con Piscina",
     "price": 850,
     "type": "rent",
-    "category": "house",
-    "location": { "lat": 10.136, "lng": -64.686 },
+    "category": "Casa",
+    "location": {
+      "lat": 10.136,
+      "lng": -64.686
+    },
     "address": "Nueva Barcelona, Anzoátegui",
-    "features": { "bedrooms": 4, "bathrooms": 3, "area": 250, "parking": true, "pool": true, "view": "city" },
-    "image": "https://placehold.co/600x400?text=Casa+Barcelona",
-    "uploader": { "name": "Carlos Ruiz", "type": "agent" }
+    "features": {
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "area": 250,
+      "parking": true,
+      "pool": true,
+      "view": "city"
+    },
+    "image": "/placeholders/Casas/imgi_68_D_Q_NP_709318-MLV89969101651_082025-F.webp",
+    "images": [
+      "/placeholders/Casas/imgi_68_D_Q_NP_709318-MLV89969101651_082025-F.webp",
+      "/placeholders/Casas/imgi_80_D_Q_NP_911499-MLV89596995414_082025-F.webp",
+      "/placeholders/Casas/imgi_92_D_Q_NP_670110-MLV89596915916_082025-F.webp"
+    ],
+    "uploader": {
+      "name": "Carlos Ruiz",
+      "type": "agent"
+    }
   },
   {
     "id": 3,
     "title": "Villa Exclusiva cerca del Mar",
     "price": 350000,
     "type": "sale",
-    "category": "villa",
-    "location": { "lat": 10.205, "lng": -64.695 },
+    "category": "Villa",
+    "location": {
+      "lat": 10.205,
+      "lng": -64.695
+    },
     "address": "El Morro, Lechería",
-    "features": { "bedrooms": 5, "bathrooms": 5, "area": 400, "parking": true, "pool": true, "view": "sea" },
-    "image": "https://placehold.co/600x400?text=Villa+Morro",
-    "uploader": { "name": "Century 21", "type": "agency" }
+    "features": {
+      "bedrooms": 5,
+      "bathrooms": 5,
+      "area": 400,
+      "parking": true,
+      "pool": true,
+      "view": "sea"
+    },
+    "image": "/placeholders/Villa/imgi_142_D_Q_NP_684851-MLV76154310705_052024-F.webp",
+    "images": [
+      "/placeholders/Villa/imgi_142_D_Q_NP_684851-MLV76154310705_052024-F.webp",
+      "/placeholders/Villa/imgi_152_D_Q_NP_798025-MLV75976094790_052024-F.webp",
+      "/placeholders/Villa/imgi_167_D_Q_NP_905156-MLV75976085096_052024-F.webp"
+    ],
+    "uploader": {
+      "name": "Century 21",
+      "type": "agency"
+    }
   },
   {
     "id": 4,
     "title": "Local Comercial en Puerto La Cruz",
     "price": 45000,
     "type": "sale",
-    "category": "commercial",
-    "location": { "lat": 10.213, "lng": -64.634 },
+    "category": "Comercio",
+    "location": {
+      "lat": 10.213,
+      "lng": -64.634
+    },
     "address": "Calle Sucre, Puerto La Cruz",
-    "features": { "bedrooms": 0, "bathrooms": 1, "area": 60, "parking": false, "pool": false, "view": "street" },
-    "image": "https://placehold.co/600x400?text=Local+PLC",
-    "uploader": { "name": "Ana Mendez", "type": "owner" }
+    "features": {
+      "bedrooms": 0,
+      "bathrooms": 1,
+      "area": 60,
+      "parking": false,
+      "pool": false,
+      "view": "street"
+    },
+    "image": "/placeholders/Comercio/imgi_42_D_NQ_NP_2X_991873-MLV99147741033_112025-F.webp",
+    "images": [
+      "/placeholders/Comercio/imgi_42_D_NQ_NP_2X_991873-MLV99147741033_112025-F.webp",
+      "/placeholders/Comercio/imgi_55_D_NQ_NP_2X_672446-MLV99147968509_112025-F.webp",
+      "/placeholders/Comercio/imgi_64_D_Q_NP_783130-MLV99147938919_112025-F.webp"
+    ],
+    "uploader": {
+      "name": "Ana Mendez",
+      "type": "owner"
+    }
   },
   {
     "id": 5,
     "title": "Apartamento Vacacional",
     "price": 60,
     "type": "rent",
-    "category": "apartment",
-    "location": { "lat": 10.180, "lng": -64.690 },
+    "category": "Apartamento",
+    "location": {
+      "lat": 10.180,
+      "lng": -64.690
+    },
     "address": "Playa Lido, Lechería",
-    "features": { "bedrooms": 2, "bathrooms": 1, "area": 75, "parking": true, "pool": true, "view": "sea" },
-    "image": "https://placehold.co/600x400?text=Vacacional",
-    "uploader": { "name": "TuHogar Agency", "type": "agency" }
+    "features": {
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "area": 75,
+      "parking": true,
+      "pool": true,
+      "view": "sea"
+    },
+    "image": "/placeholders/Apartamentos/imgi_31_D_NQ_NP_2X_878070-MLV99253422528_112025-F.webp",
+    "images": [
+      "/placeholders/Apartamentos/imgi_31_D_NQ_NP_2X_878070-MLV99253422528_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_34_D_NQ_NP_2X_997762-MLV99253680310_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_38_D_NQ_NP_2X_815145-MLV99253481846_112025-F.webp"
+    ],
+    "uploader": {
+      "name": "TuHogar Agency",
+      "type": "agency"
+    }
   },
   {
     "id": 6,
     "title": "Terreno para Construir",
     "price": 25000,
     "type": "sale",
-    "category": "land",
-    "location": { "lat": 10.120, "lng": -64.700 },
+    "category": "Terreno",
+    "location": {
+      "lat": 10.120,
+      "lng": -64.700
+    },
     "address": "Vía Alterna, Barcelona",
-    "features": { "bedrooms": 0, "bathrooms": 0, "area": 500, "parking": false, "pool": false, "view": "mountain" },
-    "image": "https://placehold.co/600x400?text=Terreno",
-    "uploader": { "name": "Pedro Perez", "type": "agent" }
+    "features": {
+      "bedrooms": 0,
+      "bathrooms": 0,
+      "area": 500,
+      "parking": false,
+      "pool": false,
+      "view": "mountain"
+    },
+    "image": "/placeholders/Casas/imgi_80_D_Q_NP_911499-MLV89596995414_082025-F.webp",
+    "images": [
+      "/placeholders/Casas/imgi_80_D_Q_NP_911499-MLV89596995414_082025-F.webp",
+      "/placeholders/Casas/imgi_92_D_Q_NP_670110-MLV89596915916_082025-F.webp",
+      "/placeholders/Casas/imgi_68_D_Q_NP_709318-MLV89969101651_082025-F.webp"
+    ],
+    "uploader": {
+      "name": "Pedro Perez",
+      "type": "agent"
+    }
   },
   {
     "id": 7,
     "title": "Penthouse Moderno",
     "price": 220000,
     "type": "sale",
-    "category": "apartment",
-    "location": { "lat": 10.195, "lng": -64.710 },
+    "category": "Apartamento",
+    "location": {
+      "lat": 10.195,
+      "lng": -64.710
+    },
     "address": "Cerro El Morro, Lechería",
-    "features": { "bedrooms": 3, "bathrooms": 3, "area": 180, "parking": true, "pool": true, "view": "panoramic" },
-    "image": "https://placehold.co/600x400?text=Penthouse",
-    "uploader": { "name": "Elite Properties", "type": "agency" }
+    "features": {
+      "bedrooms": 3,
+      "bathrooms": 3,
+      "area": 180,
+      "parking": true,
+      "pool": true,
+      "view": "panoramic"
+    },
+    "image": "/placeholders/Apartamentos/imgi_34_D_NQ_NP_2X_997762-MLV99253680310_112025-F.webp",
+    "images": [
+      "/placeholders/Apartamentos/imgi_34_D_NQ_NP_2X_997762-MLV99253680310_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_38_D_NQ_NP_2X_815145-MLV99253481846_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_29_D_NQ_NP_2X_704179-MLV99735662619_112025-F.webp"
+    ],
+    "uploader": {
+      "name": "Elite Properties",
+      "type": "agency"
+    }
   },
   {
     "id": 8,
     "title": "Oficina en Centro Empresarial",
     "price": 500,
     "type": "rent",
-    "category": "commercial",
-    "location": { "lat": 10.190, "lng": -64.698 },
+    "category": "Comercio",
+    "location": {
+      "lat": 10.190,
+      "lng": -64.698
+    },
     "address": "Av. Principal, Lechería",
-    "features": { "bedrooms": 0, "bathrooms": 2, "area": 90, "parking": true, "pool": false, "view": "city" },
-    "image": "https://placehold.co/600x400?text=Oficina",
-    "uploader": { "name": "Global Real Estate", "type": "agency" }
+    "features": {
+      "bedrooms": 0,
+      "bathrooms": 2,
+      "area": 90,
+      "parking": true,
+      "pool": false,
+      "view": "city"
+    },
+    "image": "/placeholders/Comercio/imgi_55_D_NQ_NP_2X_672446-MLV99147968509_112025-F.webp",
+    "images": [
+      "/placeholders/Comercio/imgi_55_D_NQ_NP_2X_672446-MLV99147968509_112025-F.webp",
+      "/placeholders/Comercio/imgi_64_D_Q_NP_783130-MLV99147938919_112025-F.webp",
+      "/placeholders/Comercio/imgi_42_D_NQ_NP_2X_991873-MLV99147741033_112025-F.webp"
+    ],
+    "uploader": {
+      "name": "Global Real Estate",
+      "type": "agency"
+    }
   },
   {
     "id": 9,
     "title": "Casa Colonial Remodelada",
     "price": 95000,
     "type": "sale",
-    "category": "house",
-    "location": { "lat": 10.130, "lng": -64.680 },
+    "category": "Casa",
+    "location": {
+      "lat": 10.130,
+      "lng": -64.680
+    },
     "address": "Casco Histórico, Barcelona",
-    "features": { "bedrooms": 4, "bathrooms": 2, "area": 220, "parking": false, "pool": true, "view": "garden" },
-    "image": "https://placehold.co/600x400?text=Casa+Colonial",
-    "uploader": { "name": "Maria Rodriguez", "type": "owner" }
+    "features": {
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "area": 220,
+      "parking": false,
+      "pool": true,
+      "view": "garden"
+    },
+    "image": "/placeholders/Casas/imgi_92_D_Q_NP_670110-MLV89596915916_082025-F.webp",
+    "images": [
+      "/placeholders/Casas/imgi_92_D_Q_NP_670110-MLV89596915916_082025-F.webp",
+      "/placeholders/Casas/imgi_68_D_Q_NP_709318-MLV89969101651_082025-F.webp",
+      "/placeholders/Casas/imgi_80_D_Q_NP_911499-MLV89596995414_082025-F.webp"
+    ],
+    "uploader": {
+      "name": "Maria Rodriguez",
+      "type": "owner"
+    }
   },
   {
     "id": 10,
     "title": "Apartamento Estudio",
     "price": 300,
     "type": "rent",
-    "category": "apartment",
-    "location": { "lat": 10.208, "lng": -64.640 },
+    "category": "Apartamento",
+    "location": {
+      "lat": 10.208,
+      "lng": -64.640
+    },
     "address": "Paseo Colón, Puerto La Cruz",
-    "features": { "bedrooms": 1, "bathrooms": 1, "area": 45, "parking": false, "pool": false, "view": "sea" },
-    "image": "https://placehold.co/600x400?text=Estudio",
-    "uploader": { "name": "Rentals VE", "type": "agent" }
+    "features": {
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "area": 45,
+      "parking": false,
+      "pool": false,
+      "view": "sea"
+    },
+    "image": "/placeholders/Apartamentos/imgi_38_D_NQ_NP_2X_815145-MLV99253481846_112025-F.webp",
+    "images": [
+      "/placeholders/Apartamentos/imgi_38_D_NQ_NP_2X_815145-MLV99253481846_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_29_D_NQ_NP_2X_704179-MLV99735662619_112025-F.webp",
+      "/placeholders/Apartamentos/imgi_31_D_NQ_NP_2X_878070-MLV99253422528_112025-F.webp"
+    ],
+    "uploader": {
+      "name": "Rentals VE",
+      "type": "agent"
+    }
   }
 ]

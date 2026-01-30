@@ -1,19 +1,17 @@
 <script setup>
-import { ref } from 'vue';
 import PropertyCard from '../components/PropertyCard.vue';
-import propertiesData from '../assets/properties.json';
 import { Heart } from 'lucide-vue-next';
+import { useFavorites } from '../composables/useFavorites';
 
-// Mock favorites (showing first 2 properties as example)
-const favorites = ref(propertiesData.slice(0, 2));
+const { favoriteProperties } = useFavorites();
 </script>
 
 <template>
   <div class="pt-20 pb-24 px-4 min-h-screen">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Mis Favoritos</h1>
     
-    <div v-if="favorites.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-       <div v-for="prop in favorites" :key="prop.id" class="w-full">
+    <div v-if="favoriteProperties.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+       <div v-for="prop in favoriteProperties" :key="prop.id" class="w-full">
          <PropertyCard :property="prop" class="w-full !w-full" />
       </div>
     </div>
