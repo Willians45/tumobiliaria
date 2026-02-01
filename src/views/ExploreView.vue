@@ -1,99 +1,263 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import PropertyCard from '../components/PropertyCard.vue';
+import PropertyCardList from '../components/PropertyCardList.vue';
+import MapComponent from '../components/MapComponent.vue';
 import propertiesData from '../assets/properties.json';
-import { SlidersHorizontal } from 'lucide-vue-next';
+import { SlidersHorizontal, Grid3x3, List, MapIcon } from 'lucide-vue-next';
 
 const route = useRoute();
 const properties = ref(propertiesData);
 const showFilters = ref(false);
+const viewMode = ref('grid'); // grid, list, mosaic, map
 
 // Filter State
 const filters = ref({
-  type: route.query.type || '',
-  minPrice: '',
-  maxPrice: '',
-  bedrooms: '',
-  bathrooms: '',
+  type: route.query.type || '', // sale/rent
+  category: route.query.category || '', // Apartamento/Casa/Villa/Comercio
+  maxPrice: 1000000,
+  maxArea: 500,
+  bedrooms: 0,
+  bathrooms: 0,
 });
+
+// Watch route changes to update filters
+watch(() => route.query, (newQuery) => {
+  if (newQuery.type) filters.value.type = newQuery.type;
+  if (newQuery.category) filters.value.category = newQuery.category;
+}, { immediate: true });
 
 const filteredProperties = computed(() => {
   return properties.value.filter(p => {
-    if (filters.value.type && p.type !== filters.value.type && p.category !== filters.value.type) { 
-        // Allow matching either transaction type (sale/rent) or category (house/apt) for flexibility
-        if (p.type !== filters.value.type && p.category !== filters.value.type) return false;
-    }
-    if (filters.value.minPrice && p.price < filters.value.minPrice) return false;
-    if (filters.value.maxPrice && p.price > filters.value.maxPrice) return false;
-    if (filters.value.bedrooms && p.features.bedrooms < filters.value.bedrooms) return false;
+    // Type filter (sale/rent)
+    if (filters.value.type && p.type !== filters.value.type) return false;
+    
+    // Category filter (Apartamento/Casa/Villa/Comercio)
+    if (filters.value.category && p.category !== filters.value.category) return false;
+    
+    // Price filter
+    if (p.price > filters.value.maxPrice) return false;
+    
+    // Area filter
+    if (p.features.area > filters.value.maxArea) return false;
+    
+    // Bedrooms filter
+    if (filters.value.bedrooms > 0 && p.features.bedrooms < filters.value.bedrooms) return false;
+    
+    // Bathrooms filter
+    if (filters.value.bathrooms > 0 && p.features.bathrooms < filters.value.bathrooms) return false;
+    
     return true;
   });
 });
+
+const toggleFilters = () => {
+  showFilters.value = !showFilters.value;
+};
 </script>
 
 <template>
   <div class="pt-20 pb-24 px-4 min-h-screen">
+    <!-- Header with View Modes and Filters -->
     <div class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-bold text-gray-900">Explorar</h1>
-      <button 
-        @click="showFilters = !showFilters"
-        class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-      >
-        <SlidersHorizontal :size="16" />
-        Filtros
-      </button>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Explorar</h1>
+        <p class="text-sm text-gray-500 mt-1">{{ filteredProperties.length }} propiedades encontradas</p>
+      </div>
+      
+      <div class="flex gap-2 items-center">
+        <!-- View Mode Selector -->
+        <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <button 
+            @click="viewMode = 'grid'" 
+            :class="viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500'"
+            class="p-2 rounded transition-all"
+          >
+            <Grid3x3 :size="18" />
+          </button>
+          <button 
+            @click="viewMode = 'list'" 
+            :class="viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500'"
+            class="p-2 rounded transition-all"
+          >
+            <List :size="18" />
+          </button>
+          <button 
+            @click="viewMode = 'map'" 
+            :class="viewMode === 'map' ? 'bg-white shadow-sm' : 'text-gray-500'"
+            class="p-2 rounded transition-all"
+          >
+            <MapIcon :size="18" />
+          </button>
+        </div>
+        
+        <!-- Filters Button -->
+        <button 
+          @click="toggleFilters"
+          class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
+          :class="{ 'bg-rose-50 border-rose-200 text-rose-700': showFilters }"
+        >
+          <SlidersHorizontal :size="16" />
+          Filtros
+        </button>
+      </div>
     </div>
 
     <!-- Filters Panel -->
-    <div v-if="showFilters" class="bg-white p-4 rounded-2xl shadow-sm mb-6 border border-gray-100 animate-in slide-in-from-top-2 fade-in duration-200">
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Tipo</label>
-          <select v-model="filters.type" class="w-full bg-gray-50 rounded-lg p-2 text-sm border-none focus:ring-2 focus:ring-rose-500">
-            <option value="">Todos</option>
-            <option value="sale">Venta</option>
-            <option value="rent">Alquiler</option>
-            <option value="commercial">Comercio</option>
-          </select>
+    <transition
+      enter-active-class="transition-all duration-200 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition-all duration-150 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div v-if="showFilters" class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100">
+        <!-- Type and Category -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Tipo de Transacción</label>
+            <div class="flex gap-2">
+              <button 
+                @click="filters.type = ''" 
+                :class="filters.type === '' ? 'bg-rose-500 text-white' : 'bg-gray-100 text-gray-700'"
+                class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all"
+              >
+                Cualquiera
+              </button>
+              <button 
+                @click="filters.type = 'sale'" 
+                :class="filters.type === 'sale' ? 'bg-rose-500 text-white' : 'bg-gray-100 text-gray-700'"
+                class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all"
+              >
+                Venta
+              </button>
+              <button 
+                @click="filters.type = 'rent'" 
+                :class="filters.type === 'rent' ? 'bg-rose-500 text-white' : 'bg-gray-100 text-gray-700'"
+                class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all"
+              >
+                Alquiler
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Categoría</label>
+            <select v-model="filters.category" class="w-full bg-gray-50 rounded-lg p-3 text-sm border-none focus:ring-2 focus:ring-rose-500">
+              <option value="">Todas</option>
+              <option value="Apartamento">Apartamento</option>
+              <option value="Casa">Casa</option>
+              <option value="Villa">Villa</option>
+              <option value="Comercio">Comercio</option>
+            </select>
+          </div>
         </div>
-         <div>
-          <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Habitaciones</label>
-          <select v-model="filters.bedrooms" class="w-full bg-gray-50 rounded-lg p-2 text-sm border-none focus:ring-2 focus:ring-rose-500">
-            <option value="">Cualquiera</option>
-            <option value="1">1+</option>
-            <option value="2">2+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
-          </select>
+
+        <!-- Price Slider -->
+        <div class="mb-6">
+          <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">
+            Precio máximo: ${{ filters.maxPrice.toLocaleString() }}
+          </label>
+          <input 
+            v-model.number="filters.maxPrice" 
+            type="range" 
+            min="0" 
+            max="1000000" 
+            step="10000"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
+          >
+          <div class="flex justify-between text-xs text-gray-400 mt-1">
+            <span>$0</span>
+            <span>$1,000,000</span>
+          </div>
+        </div>
+
+        <!-- Area Slider -->
+        <div class="mb-6">
+          <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">
+            Área máxima: {{ filters.maxArea }}m²
+          </label>
+          <input 
+            v-model.number="filters.maxArea" 
+            type="range" 
+            min="0" 
+            max="500" 
+            step="10"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
+          >
+          <div class="flex justify-between text-xs text-gray-400 mt-1">
+            <span>0m²</span>
+            <span>500m²</span>
+          </div>
+        </div>
+
+        <!-- Bedrooms and Bathrooms Sliders -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">
+              Habitaciones: {{ filters.bedrooms === 0 ? 'Cualquiera' : filters.bedrooms + '+' }}
+            </label>
+            <input 
+              v-model.number="filters.bedrooms" 
+              type="range" 
+              min="0" 
+              max="5" 
+              step="1"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
+            >
+            <div class="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0</span>
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5+</span>
+            </div>
+          </div>
+          
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">
+              Baños: {{ filters.bathrooms === 0 ? 'Cualquiera' : filters.bathrooms + '+' }}
+            </label>
+            <input 
+              v-model.number="filters.bathrooms" 
+              type="range" 
+              min="0" 
+              max="5" 
+              step="1"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
+            >
+            <div class="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0</span>
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5+</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Min Precio ($)</label>
-          <input v-model.number="filters.minPrice" type="number" class="w-full bg-gray-50 rounded-lg p-2 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="0">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Max Precio ($)</label>
-          <input v-model.number="filters.maxPrice" type="number" class="w-full bg-gray-50 rounded-lg p-2 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="No límite">
-        </div>
-      </div>
+    </transition>
+
+    <!-- Map View -->
+    <div v-if="viewMode === 'map'" class="h-[70vh] -mx-4">
+      <MapComponent :properties="filteredProperties" />
     </div>
 
-    <!-- Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div v-for="prop in filteredProperties" :key="prop.id" class="w-full">
-         <PropertyCard :property="prop" class="w-full !w-full" /> 
-         <!-- Note: PropertyCard has w-64 by default, we override it here with !w-full logic or we need to edit component. 
-              Let's rely on class override or wrap it. The component has w-64 class built-in. 
-              I might need to make PropertyCard more flexible or wrap it in a div that handles width.
-              Actually styling overrides might not work if scoped without deep or prop.
-              I will assume for now I should edit PropertyCard to accept class or width prop, but easier is to just wrap it in a div and hope flex-shrink-0 doesn't mess it up.
-              Actually w-64 is hardcoded class. I should probably update PropertyCard to 'w-full' and let parent control width, OR accept a prop.
-         -->
-      </div>
+    <!-- Grid View (2 columns) -->
+    <div v-else-if="viewMode === 'grid'" class="grid grid-cols-2 gap-4 md:gap-6">
+      <PropertyCard v-for="prop in filteredProperties" :key="prop.id" :property="prop" />
     </div>
-    
+
+    <!-- List View (1 column, horizontal layout) -->
+    <div v-else-if="viewMode === 'list'" class="space-y-4">
+      <PropertyCardList v-for="prop in filteredProperties" :key="prop.id" :property="prop" />
+    </div>
+
+    <!-- No Results -->
     <div v-if="filteredProperties.length === 0" class="text-center py-10 text-gray-500">
       <p>No se encontraron propiedades con estos filtros.</p>
     </div>

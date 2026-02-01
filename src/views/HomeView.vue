@@ -10,9 +10,9 @@ const properties = ref(propertiesData);
 
 // Categories for "Que buscas"
 const categories = [
-  { id: 'sale', label: 'Venta', icon: Home, color: 'text-indigo-500', bg: 'bg-indigo-50' },
-  { id: 'rent', label: 'Alquiler', icon: Key, color: 'text-rose-500', bg: 'bg-rose-50' },
-  { id: 'commercial', label: 'Comercio', icon: Store, color: 'text-amber-500', bg: 'bg-amber-50' }
+  { id: 'sale', label: 'Venta', icon: Home, color: 'text-indigo-500', bg: 'bg-indigo-50', queryKey: 'type', queryValue: 'sale' },
+  { id: 'rent', label: 'Alquiler', icon: Key, color: 'text-rose-500', bg: 'bg-rose-50', queryKey: 'type', queryValue: 'rent' },
+  { id: 'commercial', label: 'Comercio', icon: Store, color: 'text-amber-500', bg: 'bg-amber-50', queryKey: 'category', queryValue: 'Comercio' }
 ];
 
 </script>
@@ -31,7 +31,7 @@ const categories = [
         <RouterLink 
           v-for="cat in categories" 
           :key="cat.id" 
-          :to="{ name: 'explore', query: { type: cat.id } }"
+          :to="{ name: 'explore', query: { [cat.queryKey]: cat.queryValue } }"
           class="flex flex-col items-center gap-2 w-full p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all"
           :class="cat.bg"
         >
@@ -50,11 +50,9 @@ const categories = [
       
       <!-- Horizontal Scroll List -->
       <div class="flex gap-4 overflow-x-auto pb-4 pr-6 scrollbar-hide">
-        <PropertyCard 
-          v-for="prop in properties.slice(0, 5)" 
-          :key="prop.id" 
-          :property="prop"
-        />
+        <div v-for="prop in properties.slice(0, 5)" :key="prop.id" class="w-64 flex-shrink-0">
+          <PropertyCard :property="prop" />
+        </div>
       </div>
     </section>
 
