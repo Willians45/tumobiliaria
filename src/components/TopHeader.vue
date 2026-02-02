@@ -1,23 +1,50 @@
 <script setup>
-import { Search } from 'lucide-vue-next';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { Search, Bell, SlidersHorizontal } from 'lucide-vue-next';
+
+const router = useRouter();
+const searchQuery = ref('');
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({ name: 'explore', query: { q: searchQuery.value } });
+  }
+};
+
+const goToFilters = () => {
+  router.push({ name: 'explore', query: { openFilters: 'true' } });
+};
 </script>
+
 
 <template>
   <header class="fixed top-0 left-0 w-full bg-white z-40 px-6 pt-4 pb-4 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] transition-all duration-300">
-    <!-- Main Search Bar Area -->
-    <div class="bg-white rounded-full shadow-[0_3px_12px_rgba(0,0,0,0.08)] border border-gray-100 py-2.5 px-4 flex items-center gap-4 active:scale-[0.98] transition-transform duration-100">
-      <div class="flex-shrink-0 text-brand">
-        <Search :size="20" stroke-width="2.5" class="text-rose-500" />
-      </div>
-      
-      <div class="flex-1 flex flex-col justify-center">
-        <span class="text-sm font-bold text-gray-900 leading-none">¿A dónde quieres ir?</span>
-        <span class="text-[11px] text-gray-500 leading-none mt-1">Cualquier lugar · Cualquier semana</span>
+    <div class="flex items-center gap-3">
+      <!-- Main Search Bar Area -->
+      <div class="flex-1 bg-white rounded-full shadow-[0_3px_12px_rgba(0,0,0,0.08)] border border-gray-100 py-2.5 px-4 flex items-center gap-4 transition-transform duration-100">
+        <div class="flex-shrink-0 text-brand">
+          <Search :size="20" stroke-width="2.5" class="text-rose-500" />
+        </div>
+        
+        <input 
+          v-model="searchQuery"
+          @keydown.enter="handleSearch"
+          type="text"
+          placeholder="Buscar propiedad"
+          class="flex-1 bg-transparent border-none text-sm font-bold text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 px-0 truncate"
+        />
+
+        <button @click="goToFilters" class="p-2 bg-white rounded-full border border-gray-200 hover:bg-gray-50 transition-colors">
+           <SlidersHorizontal :size="14" class="text-gray-900" />
+        </button>
       </div>
 
-      <div class="p-2 bg-white rounded-full border border-gray-200">
-         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
-      </div>
+      <!-- Notification Button -->
+      <button class="p-3 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors text-gray-700 relative">
+        <Bell :size="20" />
+        <span class="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>
+      </button>
     </div>
   </header>
 </template>

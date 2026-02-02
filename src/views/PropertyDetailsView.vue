@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { MapPin, Bed, Bath, Square, User, Car, Warehouse, ArrowLeft, Star, Heart, CheckCircle2, Share2, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { MapPin, Bed, Bath, Square, User, Car, Warehouse, ArrowLeft, Star, Heart, CheckCircle2, Share2, ChevronLeft, ChevronRight, X } from 'lucide-vue-next';
 import propertiesData from '../assets/properties.json';
 import { useFavorites } from '../composables/useFavorites';
 
@@ -38,13 +38,49 @@ const nextImage = () => {
 const prevImage = () => {
     currentImageIndex.value = (currentImageIndex.value - 1 + propertyImages.value.length) % propertyImages.value.length;
 };
+const showGallery = ref(false);
+const touchStart = ref(0);
+const touchEnd = ref(0);
+
+const handleTouchStart = (e) => {
+  touchStart.value = e.changedTouches[0].screenX;
+};
+
+const handleTouchEnd = (e) => {
+  touchEnd.value = e.changedTouches[0].screenX;
+  if (touchEnd.value < touchStart.value - 50) nextImage();
+  if (touchEnd.value > touchStart.value + 50) prevImage();
+};
+
+const shareProperty = async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: property.value.title,
+        text: `Mira esta propiedad: ${property.value.title}`,
+        url: window.location.href,
+      });
+    } catch (err) {
+      console.log('Error sharing:', err);
+    }
+  } else {
+    await navigator.clipboard.writeText(window.location.href);
+    alert('Enlace copiado!');
+  }
+};
 </script>
 
 <template>
   <div v-if="property" class="min-h-screen bg-gray-50 pb-20">
-    <!-- Navbar Mobile (Hidden on mobile now, we use overlay button and internal action buttons) -->
-    <div class="hidden md:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 justify-between items-center flex">
-       <div class="w-6"></div> 
+    <!-- Navbar Mobile (Sticky) -->
+    <div class="flex md:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 justify-between items-center transition-all">
+       <button @click="goBack" class="p-2 -ml-2 rounded-full hover:bg-gray-100 text-gray-700">
+          <ArrowLeft :size="20" />
+       </button>
+       <span class="font-bold text-gray-900 truncate max-w-[200px]">{{ property.title }}</span>
+       <button @click="shareProperty" class="p-2 -mr-2 rounded-full hover:bg-gray-100 text-gray-700">
+          <Share2 :size="20" />
+       </button>
     </div>
     
     <!-- Navbar Mobile Action Buttons (REMOVED from fixed position - moving to inline) -->
@@ -63,7 +99,7 @@ const prevImage = () => {
         
         <!-- Image Gallery -->
         <div class="relative w-full aspect-[4/3] md:aspect-[16/9] md:rounded-3xl overflow-hidden group shadow-sm bg-gray-200">
-          <img :src="propertyImages[currentImageIndex]" :alt="property.title" class="w-full h-full object-cover transition-all duration-500" />
+          <img :src="propertyImages[currentImageIndex]" :alt="property.title" class="w-full h-full object-cover transition-all duration-500 cursor-pointer" @click="showGallery = true" @touchstart="handleTouchStart" @touchend="handleTouchEnd" />
           
           <!-- Back Button Overlay (Mobile & Desktop Image) -->
           <button @click="goBack" class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-md text-gray-700 hover:bg-white hover:scale-110 transition-all">
@@ -71,20 +107,20 @@ const prevImage = () => {
           </button>
 
           <!-- Image Controls (Visible always on mobile, hover on desktop) -->
-          <div class="absolute inset-0 flex items-center justify-between p-4 pointer-events-none" v-if="propertyImages.length > 1">
-               <button @click.stop="prevImage" class="pointer-events-auto bg-white/80 backdrop-blur hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-transform hover:scale-110 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+          <div class="absolute inset-0 hidden md:flex items-center justify-between p-4 pointer-events-none" v-if="propertyImages.length > 1">
+               <button @click.stop="prevImage" class="pointer-events-auto bg-white/80 backdrop-blur hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-transform hover:scale-110 opacity-0 group-hover:opacity-100 transition-opacity">
                    <ChevronLeft :size="24" />
                </button>
-               <button @click.stop="nextImage" class="pointer-events-auto bg-white/80 backdrop-blur hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-transform hover:scale-110 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+               <button @click.stop="nextImage" class="pointer-events-auto bg-white/80 backdrop-blur hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-transform hover:scale-110 opacity-0 group-hover:opacity-100 transition-opacity">
                    <ChevronRight :size="24" />
                </button>
           </div>
           
-          <!-- Image Dots (Hidden on mobile as requested) -->
-          <div class="absolute bottom-16 md:bottom-4 left-0 right-0 justify-center gap-2 z-10 px-4 hidden md:flex" v-if="propertyImages.length > 1">
+          <!-- Image Dots -->
+          <div class="absolute bottom-24 md:bottom-4 left-0 right-0 flex justify-center gap-2 z-10 px-4" v-if="propertyImages.length > 1">
               <span v-for="(img, idx) in propertyImages" :key="idx" 
                 class="w-2 h-2 rounded-full transition-all shadow-sm cursor-pointer"
-                @click="currentImageIndex = idx"
+                @click.stop="currentImageIndex = idx"
                 :class="idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'">
               </span>
           </div>
@@ -97,7 +133,7 @@ const prevImage = () => {
             </p>
           </div>
           <div class="absolute top-4 right-4 hidden md:flex gap-2">
-             <button class="bg-white/90 backdrop-blur hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm transition-all flex items-center gap-2">
+             <button @click="shareProperty" class="bg-white/90 backdrop-blur hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm transition-all flex items-center gap-2">
                 <Share2 :size="16" /> Compartir
              </button>
              <button @click="toggleFavorite(property.id)" class="bg-white/90 backdrop-blur hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm transition-all flex items-center gap-2" :class="{ 'text-red-500': isFavorite(property.id) }">
@@ -108,7 +144,7 @@ const prevImage = () => {
         
         <!-- Mobile Action Buttons (Inline) -->
         <div class="flex gap-4 px-4 md:hidden">
-            <button class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2">
+            <button @click="shareProperty" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2">
                 <Share2 :size="18" /> Compartir
             </button>
             <button @click="toggleFavorite(property.id)" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2" :class="{ 'text-red-600 border-red-100 bg-red-50': isFavorite(property.id) }">
@@ -257,6 +293,33 @@ const prevImage = () => {
 
       </div>
     
+    </div>
+
+    <!-- Gallery Modal -->
+    <div v-if="showGallery" class="fixed inset-0 z-50 bg-black flex items-center justify-center backdrop-blur-xl" @click="showGallery = false">
+        <button @click="showGallery = false" class="absolute top-4 right-4 z-50 p-2 bg-black/50 text-white rounded-full hover:bg-white/20 transition-colors">
+            <X :size="32" />
+        </button>
+        
+        <div class="relative w-full h-full max-w-7xl mx-auto flex items-center justify-center p-4">
+            <img :src="propertyImages[currentImageIndex]" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" @click.stop />
+            
+            <button @click.stop="prevImage" class="absolute left-4 p-3 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-md transition-all">
+                <ChevronLeft :size="32" />
+            </button>
+            
+            <button @click.stop="nextImage" class="absolute right-4 p-3 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-md transition-all">
+                <ChevronRight :size="32" />
+            </button>
+
+            <div class="absolute bottom-8 left-0 right-0 flex justify-center gap-2">
+                 <span v-for="(img, idx) in propertyImages" :key="idx" 
+                    class="w-2 h-2 rounded-full transition-all cursor-pointer"
+                    @click.stop="currentImageIndex = idx"
+                    :class="idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/30'">
+                  </span>
+            </div>
+        </div>
     </div>
   </div>
 </template>

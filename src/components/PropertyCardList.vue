@@ -20,9 +20,9 @@ const handleLike = (e, id) => {
 
 <template>
   <router-link :to="{ name: 'property-details', params: { id: property.id } }" class="block">
-    <div class="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 flex gap-4 group cursor-pointer w-full">
+    <div class="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row gap-4 group cursor-pointer w-full">
       <!-- Image Section -->
-      <div class="relative w-48 aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+      <div class="relative w-full md:w-48 h-48 md:h-auto md:aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
         <img :src="property.image" :alt="property.title" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         
         <!-- Favorite Button -->

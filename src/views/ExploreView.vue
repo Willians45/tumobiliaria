@@ -16,6 +16,7 @@ const viewMode = ref('grid'); // grid, list, mosaic, map
 const filters = ref({
   type: route.query.type || '', // sale/rent
   category: route.query.category || '', // Apartamento/Casa/Villa/Comercio
+  searchQuery: route.query.q || '',
   maxPrice: 1000000,
   maxArea: 500,
   bedrooms: 0,
@@ -26,6 +27,18 @@ const filters = ref({
 watch(() => route.query, (newQuery) => {
   if (newQuery.type) filters.value.type = newQuery.type;
   if (newQuery.category) filters.value.category = newQuery.category;
+  if (newQuery.q !== undefined) filters.value.searchQuery = newQuery.q;
+  
+  // Open filters panel if requested
+  if (newQuery.openFilters === 'true') {
+    showFilters.value = true;
+    
+    // Remove the query param to avoid reopening on refresh/back (optional but good UX)
+    // const query = { ...newQuery };
+    // delete query.openFilters;
+    // router.replace({ query }); 
+    // Commented out to simpler approach first
+  }
 }, { immediate: true });
 
 const filteredProperties = computed(() => {
@@ -47,6 +60,16 @@ const filteredProperties = computed(() => {
     
     // Bathrooms filter
     if (filters.value.bathrooms > 0 && p.features.bathrooms < filters.value.bathrooms) return false;
+    
+    // Search Query Filter
+    if (filters.value.searchQuery) {
+        const query = filters.value.searchQuery.toLowerCase();
+        const matchesTitle = p.title?.toLowerCase().includes(query);
+        const matchesAddress = p.address?.toLowerCase().includes(query);
+        const matchesLocation = p.location?.city?.toLowerCase().includes(query);
+        
+        if (!matchesTitle && !matchesAddress && !matchesLocation) return false;
+    }
     
     return true;
   });
