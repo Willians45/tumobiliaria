@@ -1,12 +1,18 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { computed } from 'vue';
+import { RouterView, useRoute } from 'vue-router'
 import BottomNav from './components/BottomNav.vue'
 import TopHeader from './components/TopHeader.vue'
+
+const route = useRoute();
+const hideTopHeader = computed(() => {
+  return ['property-details', 'agent-profile'].includes(route.name);
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-gray-900 pb-20">
-    <TopHeader />
+    <TopHeader v-if="!hideTopHeader" />
     
     <main class="">
       <RouterView v-slot="{ Component }">

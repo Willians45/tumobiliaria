@@ -1,15 +1,28 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { MapPin, Bed, Bath, Square, User, Car, Warehouse, ArrowLeft, Star, Heart, CheckCircle2, Share2, ChevronLeft, ChevronRight, X } from 'lucide-vue-next';
+import { MapPin, Bed, Bath, Square, User, Car, Warehouse, ArrowLeft, Star, Heart, CheckCircle2, Share2, ChevronLeft, ChevronRight, X, LogIn } from 'lucide-vue-next';
 import propertiesData from '../assets/properties.json';
 import { useFavorites } from '../composables/useFavorites';
+import { useAuth } from '../composables/useAuth';
 
 const route = useRoute();
 const router = useRouter();
 const property = ref(null);
 const currentImageIndex = ref(0);
 const { toggleFavorite, isFavorite } = useFavorites();
+const { currentUser, isGuest, loginAsTestUser } = useAuth();
+
+const userRating = ref(0);
+const hoverRating = ref(0);
+
+const handleRate = (rating) => {
+  if (isGuest.value) {
+    alert('Debes iniciar sesión para puntuar esta propiedad.');
+    return;
+  }
+  userRating.value = rating;
+};
 
 // Computed property to use the real images
 const propertyImages = computed(() => {
@@ -71,7 +84,7 @@ const shareProperty = async () => {
 </script>
 
 <template>
-  <div v-if="property" class="min-h-screen bg-gray-50 pb-20">
+  <div v-if="property" class="pt-0 pb-24 min-h-screen bg-gray-50">
     <!-- Navbar Mobile (Sticky) -->
     <div class="flex md:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 justify-between items-center transition-all">
        <button @click="goBack" class="p-2 -ml-2 rounded-full hover:bg-gray-100 text-gray-700">
@@ -99,10 +112,21 @@ const shareProperty = async () => {
         
         <!-- Image Gallery -->
         <div class="relative w-full aspect-[4/3] md:aspect-[16/9] md:rounded-3xl overflow-hidden group shadow-sm bg-gray-200">
-          <img :src="propertyImages[currentImageIndex]" :alt="property.title" class="w-full h-full object-cover transition-all duration-500 cursor-pointer" @click="showGallery = true" @touchstart="handleTouchStart" @touchend="handleTouchEnd" />
+          <!-- Slider Container -->
+          <div 
+            class="flex h-full transition-transform duration-500 ease-out cursor-pointer" 
+            :style="{ transform: `translateX(-${currentImageIndex * 100}%)` }"
+            @click="showGallery = true"
+            @touchstart="handleTouchStart" 
+            @touchend="handleTouchEnd"
+          >
+            <div v-for="(img, idx) in propertyImages" :key="idx" class="w-full h-full flex-shrink-0">
+              <img :src="img" :alt="property.title" class="w-full h-full object-cover" />
+            </div>
+          </div>
           
-          <!-- Back Button Overlay (Mobile & Desktop Image) -->
-          <button @click="goBack" class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-md text-gray-700 hover:bg-white hover:scale-110 transition-all">
+          <!-- Back Button Overlay (Desktop Only - Mobile has sticky navbar) -->
+          <button @click="goBack" class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-md text-gray-700 hover:bg-white hover:scale-110 transition-all hidden md:block">
              <ArrowLeft :size="24" />
           </button>
 
@@ -117,7 +141,7 @@ const shareProperty = async () => {
           </div>
           
           <!-- Image Dots -->
-          <div class="absolute bottom-24 md:bottom-4 left-0 right-0 flex justify-center gap-2 z-10 px-4" v-if="propertyImages.length > 1">
+          <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10 px-4" v-if="propertyImages.length > 1">
               <span v-for="(img, idx) in propertyImages" :key="idx" 
                 class="w-2 h-2 rounded-full transition-all shadow-sm cursor-pointer"
                 @click.stop="currentImageIndex = idx"
@@ -125,13 +149,6 @@ const shareProperty = async () => {
               </span>
           </div>
 
-          <!-- Image Overlay Info (Mobile Only) -->
-          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent pt-12 p-5 md:hidden pointer-events-none">
-            <h1 class="text-white text-2xl font-bold leading-tight mb-1 text-outline drop-shadow-md">{{ property.title }}</h1>
-            <p class="text-white/90 text-sm flex items-center gap-1 font-medium text-shadow-sm">
-              <MapPin :size="14"/> {{ property.location.city || property.address }}
-            </p>
-          </div>
           <div class="absolute top-4 right-4 hidden md:flex gap-2">
              <button @click="shareProperty" class="bg-white/90 backdrop-blur hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm transition-all flex items-center gap-2">
                 <Share2 :size="16" /> Compartir
@@ -140,6 +157,20 @@ const shareProperty = async () => {
                 <Heart :size="16" :class="{ 'fill-current': isFavorite(property.id) }" /> Guardar
              </button>
           </div>
+        </div>
+        
+        <!-- Mobile Property Info (Moved out of image) -->
+        <div class="px-5 md:hidden">
+            <div class="flex justify-between items-start mb-2">
+              <h1 class="text-gray-900 text-2xl font-bold leading-tight">{{ property.title }}</h1>
+              <div class="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded mt-1 shrink-0">
+                  <Star :size="14" class="text-orange-400 fill-orange-400" /> 
+                  <span class="text-sm font-bold">4.88</span>
+              </div>
+            </div>
+            <p class="text-gray-500 text-sm flex items-center gap-1">
+              <MapPin :size="14"/> {{ property.location.city || property.address }}
+            </p>
         </div>
         
         <!-- Mobile Action Buttons (Inline) -->
@@ -257,9 +288,50 @@ const shareProperty = async () => {
                  </div>
              </div>
 
-            <button class="w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+            <router-link 
+                :to="{ name: 'agent-profile', params: { name: property.uploader.name } }"
+                class="w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+            >
                 Ver perfil
-            </button>
+            </router-link>
+        </div>
+
+        <!-- Rating Card -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+             <h3 class="text-lg font-bold text-gray-900 mb-1 text-center md:text-left">Puntúa esta propiedad</h3>
+             <p class="text-sm text-gray-500 mb-4 text-center md:text-left">Tu opinión ayuda a otros usuarios.</p>
+             
+             <div class="flex justify-center md:justify-start gap-2 mb-4">
+                 <button 
+                    v-for="star in 5" 
+                    :key="star"
+                    @click="handleRate(star)"
+                    @mouseenter="hoverRating = star"
+                    @mouseleave="hoverRating = 0"
+                    class="transition-all duration-200"
+                    :class="{ 'scale-110': hoverRating >= star }"
+                 >
+                    <Star 
+                        :size="32" 
+                        :class="[
+                            (hoverRating || userRating) >= star 
+                            ? 'text-orange-400 fill-orange-400' 
+                            : 'text-gray-200'
+                        ]" 
+                        stroke-width="1.5"
+                    />
+                 </button>
+             </div>
+
+             <div v-if="isGuest" class="bg-rose-50 border border-rose-100 rounded-xl p-4">
+                 <p class="text-xs text-rose-700 font-medium">Debes iniciar sesión para poder puntuar esta propiedad.</p>
+             </div>
+             <div v-else class="text-center md:text-left">
+                  <p class="text-sm font-medium text-green-600 flex items-center justify-center md:justify-start gap-2">
+                      <CheckCircle2 :size="16" /> ¡Sesión iniciada como {{ currentUser.name }}!
+                  </p>
+                  <p v-if="userRating > 0" class="text-xs text-gray-500 mt-2">Gracias por puntuar con {{ userRating }} estrellas.</p>
+             </div>
         </div>
 
         <!-- Action Card -->
@@ -301,8 +373,16 @@ const shareProperty = async () => {
             <X :size="32" />
         </button>
         
-        <div class="relative w-full h-full max-w-7xl mx-auto flex items-center justify-center p-4">
-            <img :src="propertyImages[currentImageIndex]" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" @click.stop />
+        <div class="relative w-full h-full max-w-7xl mx-auto flex items-center justify-center p-4 overflow-hidden">
+            <!-- Fullscreen Slider Container -->
+            <div 
+              class="flex h-full w-full transition-transform duration-500 ease-out" 
+              :style="{ transform: `translateX(-${currentImageIndex * 100}%)` }"
+            >
+              <div v-for="(img, idx) in propertyImages" :key="idx" class="w-full h-full flex-shrink-0 flex items-center justify-center p-4">
+                <img :src="img" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" @click.stop />
+              </div>
+            </div>
             
             <button @click.stop="prevImage" class="absolute left-4 p-3 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-md transition-all">
                 <ChevronLeft :size="32" />

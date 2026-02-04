@@ -2,9 +2,11 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Search, Bell, SlidersHorizontal } from 'lucide-vue-next';
+import { useAuth } from '../composables/useAuth';
 
 const router = useRouter();
 const searchQuery = ref('');
+const { currentUser, isGuest, loginAsTestUser, logout } = useAuth();
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
@@ -17,9 +19,8 @@ const goToFilters = () => {
 };
 </script>
 
-
 <template>
-  <header class="fixed top-0 left-0 w-full bg-white z-40 px-6 pt-4 pb-4 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] transition-all duration-300">
+  <header class="fixed top-0 left-0 w-full bg-white z-40 px-4 md:px-6 pt-4 pb-4 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] transition-all duration-300">
     <div class="flex items-center gap-3">
       <!-- Main Search Bar Area -->
       <div class="flex-1 bg-white rounded-full shadow-[0_3px_12px_rgba(0,0,0,0.08)] border border-gray-100 py-2.5 px-4 flex items-center gap-4 transition-transform duration-100">
