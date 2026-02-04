@@ -9,11 +9,16 @@ import { ChevronRight } from 'lucide-vue-next';
 // Use mock data
 const properties = ref(propertiesData);
 
+// Helper to get image URL for production
+const getImageUrl = (path) => {
+  return new URL(path, import.meta.url).href;
+};
+
 // Categories for "Que buscas"
 const categories = [
-  { id: 'sale', label: 'Venta', icon: '/src/assets/categories/venta.png', queryKey: 'type', queryValue: 'sale' },
-  { id: 'rent', label: 'Alquiler', icon: '/src/assets/categories/alquiler.png', queryKey: 'type', queryValue: 'rent' },
-  { id: 'commercial', label: 'Comercio', icon: '/src/assets/categories/comercio.png', queryKey: 'category', queryValue: 'Comercio' }
+  { id: 'sale', label: 'Venta', icon: getImageUrl('../assets/categories/venta.png'), queryKey: 'type', queryValue: 'sale' },
+  { id: 'rent', label: 'Alquiler', icon: getImageUrl('../assets/categories/alquiler.png'), queryKey: 'type', queryValue: 'rent' },
+  { id: 'commercial', label: 'Comercio', icon: getImageUrl('../assets/categories/comercio.png'), queryKey: 'category', queryValue: 'Comercio' }
 ];
 
 </script>
