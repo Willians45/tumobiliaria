@@ -3,22 +3,20 @@ import { ref, onMounted } from 'vue';
 import MapComponent from '../components/MapComponent.vue';
 import PropertyCard from '../components/PropertyCard.vue';
 import propertiesData from '../assets/properties.json';
-// Lucide icons removed in favor of professional PNG icons
+// Explicitly import icons for production reliability
+import ventaIcon from '../assets/categories/venta.png';
+import alquilerIcon from '../assets/categories/alquiler.png';
+import comercioIcon from '../assets/categories/comercio.png';
 import { ChevronRight } from 'lucide-vue-next';
 
 // Use mock data
 const properties = ref(propertiesData);
 
-// Helper to get image URL for production
-const getImageUrl = (path) => {
-  return new URL(path, import.meta.url).href;
-};
-
 // Categories for "Que buscas"
 const categories = [
-  { id: 'sale', label: 'Venta', icon: getImageUrl('../assets/categories/venta.png'), queryKey: 'type', queryValue: 'sale' },
-  { id: 'rent', label: 'Alquiler', icon: getImageUrl('../assets/categories/alquiler.png'), queryKey: 'type', queryValue: 'rent' },
-  { id: 'commercial', label: 'Comercio', icon: getImageUrl('../assets/categories/comercio.png'), queryKey: 'category', queryValue: 'Comercio' }
+  { id: 'sale', label: 'Venta', icon: ventaIcon, queryKey: 'type', queryValue: 'sale' },
+  { id: 'rent', label: 'Alquiler', icon: alquilerIcon, queryKey: 'type', queryValue: 'rent' },
+  { id: 'commercial', label: 'Comercio', icon: comercioIcon, queryKey: 'category', queryValue: 'Comercio' }
 ];
 
 </script>
