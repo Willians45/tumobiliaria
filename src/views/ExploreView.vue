@@ -5,7 +5,7 @@ import PropertyCard from '../components/PropertyCard.vue';
 import PropertyCardList from '../components/PropertyCardList.vue';
 import MapComponent from '../components/MapComponent.vue';
 import propertiesData from '../assets/properties.json';
-import { SlidersHorizontal, Grid3x3, List, MapIcon } from 'lucide-vue-next';
+import { SlidersHorizontal, Grid3x3, List, MapIcon, X } from 'lucide-vue-next';
 
 const route = useRoute();
 const properties = ref(propertiesData);
@@ -27,7 +27,11 @@ const filters = ref({
 watch(() => route.query, (newQuery) => {
   if (newQuery.type) filters.value.type = newQuery.type;
   if (newQuery.category) filters.value.category = newQuery.category;
-  if (newQuery.q !== undefined) filters.value.searchQuery = newQuery.q;
+  if (newQuery.q !== undefined) {
+    filters.value.searchQuery = newQuery.q;
+  } else {
+    filters.value.searchQuery = '';
+  }
   
   // Open filters panel if requested
   if (newQuery.openFilters === 'true') {
@@ -83,46 +87,66 @@ const toggleFilters = () => {
 <template>
   <div class="pt-20 pb-24 px-4 min-h-screen">
     <!-- Header with View Modes and Filters -->
-    <div class="flex justify-between items-center mb-4">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Explorar</h1>
-        <p class="text-sm text-gray-500 mt-1">{{ filteredProperties.length }} propiedades encontradas</p>
+    <div class="space-y-4 mb-6">
+      <div class="flex justify-between items-end">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Explorar</h1>
+          <p class="text-sm font-medium text-gray-500 mt-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span>
+            {{ filteredProperties.length }} propiedades disponibles
+          </p>
+        </div>
+        
+        <div class="flex gap-2 items-center">
+          <!-- View Mode Selector -->
+          <div class="flex gap-1 bg-gray-100/80 p-1 rounded-xl backdrop-blur-sm">
+            <button 
+              @click="viewMode = 'grid'" 
+              :class="viewMode === 'grid' ? 'bg-white shadow-md text-gray-900' : 'text-gray-400'"
+              class="p-2 rounded-lg transition-all"
+            >
+              <Grid3x3 :size="18" />
+            </button>
+            <button 
+              @click="viewMode = 'list'" 
+              :class="viewMode === 'list' ? 'bg-white shadow-md text-gray-900' : 'text-gray-400'"
+              class="p-2 rounded-lg transition-all"
+            >
+              <List :size="18" />
+            </button>
+            <button 
+              @click="viewMode = 'map'" 
+              :class="viewMode === 'map' ? 'bg-white shadow-md text-gray-900' : 'text-gray-400'"
+              class="p-2 rounded-lg transition-all"
+            >
+              <MapIcon :size="18" />
+            </button>
+          </div>
+          
+          <!-- Filters Button -->
+          <button 
+            @click="toggleFilters"
+            class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-100 rounded-xl shadow-sm text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all active:scale-95"
+            :class="{ 'bg-rose-50 border-rose-200 text-rose-700': showFilters }"
+          >
+            <SlidersHorizontal :size="16" stroke-width="2.5" />
+            <span>Filtros</span>
+          </button>
+        </div>
       </div>
-      
-      <div class="flex gap-2 items-center">
-        <!-- View Mode Selector -->
-        <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
-          <button 
-            @click="viewMode = 'grid'" 
-            :class="viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500'"
-            class="p-2 rounded transition-all"
-          >
-            <Grid3x3 :size="18" />
-          </button>
-          <button 
-            @click="viewMode = 'list'" 
-            :class="viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500'"
-            class="p-2 rounded transition-all"
-          >
-            <List :size="18" />
-          </button>
-          <button 
-            @click="viewMode = 'map'" 
-            :class="viewMode === 'map' ? 'bg-white shadow-sm' : 'text-gray-500'"
-            class="p-2 rounded transition-all"
-          >
-            <MapIcon :size="18" />
+
+      <!-- Real-time Search Tags -->
+      <div v-if="filters.searchQuery" class="flex flex-wrap gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-900 text-white rounded-full text-xs font-bold shadow-lg shadow-gray-200">
+          <span>Buscas: "{{ filters.searchQuery }}"</span>
+          <button @click="filters.searchQuery = ''" class="hover:text-rose-400 transition-colors">
+            <X :size="14" stroke-width="3" />
           </button>
         </div>
         
-        <!-- Filters Button -->
-        <button 
-          @click="toggleFilters"
-          class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
-          :class="{ 'bg-rose-50 border-rose-200 text-rose-700': showFilters }"
-        >
-          <SlidersHorizontal :size="16" />
-          Filtros
+        <!-- Quick Action to clear all if we had more tags -->
+        <button v-if="filters.searchQuery" @click="filters.searchQuery = ''" class="text-xs font-bold text-gray-400 hover:text-rose-500 transition-colors px-2">
+          Limpiar todos
         </button>
       </div>
     </div>

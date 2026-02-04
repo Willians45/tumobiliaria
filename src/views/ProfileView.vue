@@ -5,13 +5,20 @@ import { useAuth } from '../composables/useAuth';
 
 const { currentUser, isGuest, loginAsTestUser, logout } = useAuth();
 const isLogin = ref(true);
+const isSubmitting = ref(false);
 
 const handleAuthAction = () => {
-    if (isLogin.value) {
-        loginAsTestUser();
-    } else {
-        loginAsTestUser(); // Simplified for now: any action logs in the test user
-    }
+    isSubmitting.value = true;
+    
+    // Simulate a professional loading process
+    setTimeout(() => {
+        if (isLogin.value) {
+            loginAsTestUser();
+        } else {
+            loginAsTestUser();
+        }
+        isSubmitting.value = false;
+    }, 1000);
 };
 </script>
 
@@ -48,7 +55,7 @@ const handleAuthAction = () => {
     </div>
 
     <!-- Auth Forms (Only show if Guest) -->
-    <div v-if="isGuest" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+    <div v-if="isGuest" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-hidden">
       <div class="flex mb-6 bg-gray-100 rounded-lg p-1">
         <button 
           @click="isLogin = true"
@@ -62,35 +69,46 @@ const handleAuthAction = () => {
         >Registrarse</button>
       </div>
 
-      <form @submit.prevent="handleAuthAction" class="space-y-4">
-        <div v-if="!isLogin">
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre Completo</label>
-          <div class="relative">
-            <User :size="18" class="absolute left-3 top-3 text-gray-400" />
-            <input type="text" class="w-full bg-gray-50 rounded-xl py-2.5 pl-10 pr-4 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="Juan Pérez">
+      <transition name="fade-slide" mode="out-in">
+        <form :key="isLogin ? 'login' : 'register'" @submit.prevent="handleAuthAction" class="space-y-4">
+          <div v-if="!isLogin">
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre Completo</label>
+            <div class="relative">
+              <User :size="18" class="absolute left-3 top-3 text-gray-400" />
+              <input type="text" class="w-full bg-gray-50 rounded-xl py-2.5 pl-10 pr-4 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="Juan Pérez">
+            </div>
           </div>
-        </div>
-        
-        <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Correo Electrónico</label>
-          <div class="relative">
-            <Mail :size="18" class="absolute left-3 top-3 text-gray-400" />
-            <input type="email" class="w-full bg-gray-50 rounded-xl py-2.5 pl-10 pr-4 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="correo@ejemplo.com">
+          
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Correo Electrónico</label>
+            <div class="relative">
+              <Mail :size="18" class="absolute left-3 top-3 text-gray-400" />
+              <input type="email" class="w-full bg-gray-50 rounded-xl py-2.5 pl-10 pr-4 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="correo@ejemplo.com">
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Contraseña</label>
-          <div class="relative">
-            <Lock :size="18" class="absolute left-3 top-3 text-gray-400" />
-            <input type="password" class="w-full bg-gray-50 rounded-xl py-2.5 pl-10 pr-4 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="••••••••">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Contraseña</label>
+            <div class="relative">
+              <Lock :size="18" class="absolute left-3 top-3 text-gray-400" />
+              <input type="password" class="w-full bg-gray-50 rounded-xl py-2.5 pl-10 pr-4 text-sm border-none focus:ring-2 focus:ring-rose-500" placeholder="••••••••">
+            </div>
           </div>
-        </div>
 
-        <button type="submit" class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-rose-600 transition-colors mt-2">
-          {{ isLogin ? 'Ingresar' : 'Crear Cuenta' }}
-        </button>
-      </form>
+          <button 
+            type="submit" 
+            :disabled="isSubmitting"
+            class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-rose-600 transition-all mt-2 flex items-center justify-center gap-2 relative overflow-hidden"
+            :class="{ 'bg-rose-400 cursor-not-allowed': isSubmitting }"
+          >
+            <span v-if="!isSubmitting">{{ isLogin ? 'Ingresar' : 'Crear Cuenta' }}</span>
+            <div v-else class="flex items-center gap-2">
+               <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+               <span>Procesando...</span>
+            </div>
+          </button>
+        </form>
+      </transition>
 
       <div class="relative my-6">
         <div class="absolute inset-0 flex items-center">
@@ -118,3 +136,29 @@ const handleAuthAction = () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pop {
+  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+</style>

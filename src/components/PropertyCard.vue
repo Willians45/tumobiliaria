@@ -35,7 +35,7 @@ const handleLike = (e, id) => {
         </button>
 
         <!-- Badge -->
-        <div v-if="property.uploader?.name" class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm">
+        <div v-if="property.uploader?.name" class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm z-10">
           <span class="text-[10px] font-bold text-gray-800 uppercase tracking-wide flex items-center gap-1">
             {{ property.category }}
           </span>

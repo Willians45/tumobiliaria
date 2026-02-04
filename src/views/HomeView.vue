@@ -3,40 +3,44 @@ import { ref, onMounted } from 'vue';
 import MapComponent from '../components/MapComponent.vue';
 import PropertyCard from '../components/PropertyCard.vue';
 import propertiesData from '../assets/properties.json';
-import { Home, Key, Store } from 'lucide-vue-next';
+// Lucide icons removed in favor of professional PNG icons
+import { ChevronRight } from 'lucide-vue-next';
 
 // Use mock data
 const properties = ref(propertiesData);
 
 // Categories for "Que buscas"
 const categories = [
-  { id: 'sale', label: 'Venta', icon: Home, color: 'text-indigo-500', bg: 'bg-indigo-50', queryKey: 'type', queryValue: 'sale' },
-  { id: 'rent', label: 'Alquiler', icon: Key, color: 'text-rose-500', bg: 'bg-rose-50', queryKey: 'type', queryValue: 'rent' },
-  { id: 'commercial', label: 'Comercio', icon: Store, color: 'text-amber-500', bg: 'bg-amber-50', queryKey: 'category', queryValue: 'Comercio' }
+  { id: 'sale', label: 'Venta', icon: '/src/assets/categories/venta.png', queryKey: 'type', queryValue: 'sale' },
+  { id: 'rent', label: 'Alquiler', icon: '/src/assets/categories/alquiler.png', queryKey: 'type', queryValue: 'rent' },
+  { id: 'commercial', label: 'Comercio', icon: '/src/assets/categories/comercio.png', queryKey: 'category', queryValue: 'Comercio' }
 ];
 
 </script>
 
 <template>
-  <div class="pt-24 pb-24">
+  <div class="pt-24 pb-24 min-h-screen bg-white">
     <!-- Map Section -->
     <section class="relative px-6 -mt-2">
       <MapComponent :properties="properties" />
     </section>
 
     <!-- Categories Section -->
-    <section class="px-6 mt-8">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">¿Qué estás buscando?</h2>
-      <div class="flex gap-4 justify-between">
+    <section class="px-6 mt-10">
+      <h2 class="text-xl font-bold text-gray-900 mb-6">¿Qué estás buscando?</h2>
+      <div class="grid grid-cols-3 gap-6">
         <RouterLink 
           v-for="cat in categories" 
           :key="cat.id" 
           :to="{ name: 'explore', query: { [cat.queryKey]: cat.queryValue } }"
-          class="flex flex-col items-center gap-2 w-full p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all"
-          :class="cat.bg"
+          class="flex flex-col items-center gap-3 group active:scale-95 transition-all duration-200"
         >
-          <component :is="cat.icon" :size="32" :class="cat.color" stroke-width="1.5" />
-          <span class="text-sm font-medium text-gray-700">{{ cat.label }}</span>
+          <div class="relative w-24 h-24 rounded-full border-2 border-orange-400 p-1 bg-white shadow-sm overflow-hidden group-hover:shadow-md group-hover:border-orange-500 transition-all">
+            <div class="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center p-1">
+                <img :src="cat.icon" :alt="cat.label" class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
+            </div>
+          </div>
+          <span class="text-sm font-bold text-gray-800 tracking-tight">{{ cat.label }}</span>
         </RouterLink>
       </div>
     </section>

@@ -38,6 +38,11 @@ const router = createRouter({
       path: '/agent/:name',
       name: 'agent-profile',
       component: () => import('../views/AgentProfileView.vue')
+    },
+    {
+      path: '/membership',
+      name: 'membership',
+      component: () => import('../views/MembershipView.vue')
     }
   ],
   scrollBehavior(to, from, savedPosition) {

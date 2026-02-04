@@ -53,16 +53,35 @@ const prevImage = () => {
 };
 const showGallery = ref(false);
 const touchStart = ref(0);
-const touchEnd = ref(0);
+const dragOffset = ref(0);
+const isDragging = ref(false);
+const containerWidth = ref(0);
 
 const handleTouchStart = (e) => {
-  touchStart.value = e.changedTouches[0].screenX;
+  touchStart.value = e.touches[0].clientX;
+  isDragging.value = true;
+  containerWidth.value = e.currentTarget.offsetWidth;
 };
 
-const handleTouchEnd = (e) => {
-  touchEnd.value = e.changedTouches[0].screenX;
-  if (touchEnd.value < touchStart.value - 50) nextImage();
-  if (touchEnd.value > touchStart.value + 50) prevImage();
+const handleTouchMove = (e) => {
+  if (!isDragging.value) return;
+  const currentX = e.touches[0].clientX;
+  dragOffset.value = currentX - touchStart.value;
+};
+
+const handleTouchEnd = () => {
+  if (!isDragging.value) return;
+  isDragging.value = false;
+  
+  const threshold = containerWidth.value * 0.2;
+  
+  if (dragOffset.value < -threshold) {
+    nextImage();
+  } else if (dragOffset.value > threshold) {
+    prevImage();
+  }
+  
+  dragOffset.value = 0;
 };
 
 const shareProperty = async () => {
@@ -114,10 +133,12 @@ const shareProperty = async () => {
         <div class="relative w-full aspect-[4/3] md:aspect-[16/9] md:rounded-3xl overflow-hidden group shadow-sm bg-gray-200">
           <!-- Slider Container -->
           <div 
-            class="flex h-full transition-transform duration-500 ease-out cursor-pointer" 
-            :style="{ transform: `translateX(-${currentImageIndex * 100}%)` }"
+            class="flex h-full cursor-pointer" 
+            :class="{ 'transition-transform duration-500 ease-out': !isDragging }"
+            :style="{ transform: `translateX(calc(-${currentImageIndex * 100}% + ${dragOffset}px))` }"
             @click="showGallery = true"
             @touchstart="handleTouchStart" 
+            @touchmove="handleTouchMove"
             @touchend="handleTouchEnd"
           >
             <div v-for="(img, idx) in propertyImages" :key="idx" class="w-full h-full flex-shrink-0">
@@ -376,8 +397,13 @@ const shareProperty = async () => {
         <div class="relative w-full h-full max-w-7xl mx-auto flex items-center justify-center p-4 overflow-hidden">
             <!-- Fullscreen Slider Container -->
             <div 
-              class="flex h-full w-full transition-transform duration-500 ease-out" 
-              :style="{ transform: `translateX(-${currentImageIndex * 100}%)` }"
+              class="flex h-full w-full cursor-pointer" 
+              :class="{ 'transition-transform duration-500 ease-out': !isDragging }"
+              :style="{ transform: `translateX(calc(-${currentImageIndex * 100}% + ${dragOffset}px))` }"
+              @touchstart="handleTouchStart" 
+              @touchmove="handleTouchMove"
+              @touchend="handleTouchEnd"
+              @click.stop
             >
               <div v-for="(img, idx) in propertyImages" :key="idx" class="w-full h-full flex-shrink-0 flex items-center justify-center p-4">
                 <img :src="img" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" @click.stop />
