@@ -84,9 +84,9 @@ const handleFinishPublishing = async () => {
     await saveProperty({
       ...newPropertyData.value,
       uploader: {
-        name: currentUser.value.name,
+        name: currentUser.value ? currentUser.value.name : "Invitado",
         image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200", // Placeholder
-        type: "Agente Certificado"
+        type: currentUser.value ? "Agente Certificado" : "Invitado"
       }
     });
     isPublishing.value = false;

@@ -45,14 +45,23 @@ export function usePropertyStorage() {
                 status: 'published'
             };
 
-            userProperties.value.push(newProperty);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(userProperties.value));
+            const updatedProperties = [...userProperties.value, newProperty];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProperties));
+
+            // Only update reactive state if save was successful
+            userProperties.value = updatedProperties;
 
             isLoading.value = false;
             return newProperty;
         } catch (e) {
             console.error('Error saving property:', e);
             isLoading.value = false;
+
+            if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                alert('¡Error! No hay espacio suficiente en el almacenamiento local para guardar esta propiedad con tantas imágenes. Intenta subir menos fotos o fotos más pequeñas.');
+            } else {
+                alert('Hubo un error al intentar guardar la propiedad. Por favor, intenta de nuevo.');
+            }
             throw e;
         }
     };
@@ -73,12 +82,40 @@ export function usePropertyStorage() {
     };
 
     const uploadImage = async (file) => {
-        // For MVP, we convert to Base64
-        // In the future, this is where Cloudinary integration goes
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 1200;
+
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress as JPEG
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    resolve(compressedBase64);
+                };
+            };
             reader.onerror = error => reject(error);
         });
     };
