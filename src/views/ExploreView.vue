@@ -6,9 +6,19 @@ import PropertyCardList from '../components/PropertyCardList.vue';
 import MapComponent from '../components/MapComponent.vue';
 import propertiesData from '../assets/properties.json';
 import { SlidersHorizontal, Grid3x3, List, MapIcon, X } from 'lucide-vue-next';
+import { usePropertyStorage } from '../composables/usePropertyStorage';
+import { onMounted } from 'vue';
 
 const route = useRoute();
-const properties = ref(propertiesData);
+const { userProperties, loadProperties } = usePropertyStorage();
+
+onMounted(() => {
+  loadProperties();
+});
+
+const properties = computed(() => {
+  return [...userProperties.value, ...propertiesData];
+});
 const showFilters = ref(false);
 const viewMode = ref('grid'); // grid, list, mosaic, map
 
@@ -85,9 +95,9 @@ const toggleFilters = () => {
 </script>
 
 <template>
-  <div class="pt-20 pb-24 px-4 min-h-screen">
+  <div class="px-4 flex flex-col" :class="viewMode === 'map' ? 'h-screen pt-24 pb-20 overflow-hidden' : 'pt-24 pb-24 min-h-screen'">
     <!-- Header with View Modes and Filters -->
-    <div class="space-y-4 mb-6">
+    <div class="space-y-4 mb-6 flex-shrink-0">
       <div class="flex justify-between items-end">
         <div>
           <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Explorar</h1>
@@ -160,7 +170,7 @@ const toggleFilters = () => {
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 -translate-y-2"
     >
-      <div v-if="showFilters" class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100">
+      <div v-if="showFilters" class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100 flex-shrink-0">
         <!-- Type and Category -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
@@ -290,8 +300,8 @@ const toggleFilters = () => {
     </transition>
 
     <!-- Map View -->
-    <div v-if="viewMode === 'map'" class="h-[70vh] -mx-4">
-      <MapComponent :properties="filteredProperties" />
+    <div v-if="viewMode === 'map'" class="flex-1 -mx-4">
+      <MapComponent :properties="filteredProperties" height="h-full" />
     </div>
 
     <!-- Grid View (2 columns) -->

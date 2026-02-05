@@ -1,9 +1,13 @@
 <script setup>
 import { ref } from 'vue';
-import { User, Mail, Lock, LogIn, LogOut, CheckCircle2 } from 'lucide-vue-next';
+import { User, Mail, Lock, LogIn, LogOut, CheckCircle2, FileText, Settings } from 'lucide-vue-next';
 import { useAuth } from '../composables/useAuth';
+import { useRouter } from 'vue-router';
+import { usePropertyStorage } from '../composables/usePropertyStorage';
 
 const { currentUser, isGuest, loginAsTestUser, logout } = useAuth();
+const { userProperties } = usePropertyStorage();
+const router = useRouter();
 const isLogin = ref(true);
 const isSubmitting = ref(false);
 
@@ -23,7 +27,7 @@ const handleAuthAction = () => {
 </script>
 
 <template>
-  <div class="pt-20 pb-24 px-4 min-h-screen bg-gray-50">
+  <div class="pt-24 pb-24 px-4 min-h-screen bg-gray-50">
     <!-- Profile Header -->
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6 text-center">
       <div class="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
@@ -44,11 +48,11 @@ const handleAuthAction = () => {
       
       <div class="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
         <div>
-          <span class="block font-bold text-xl text-gray-900">{{ isGuest ? 0 : 3 }}</span>
+          <span class="block font-bold text-xl text-gray-900">{{ isGuest ? 0 : userProperties.length }}</span>
           <span class="text-xs text-gray-400 uppercase tracking-wide">Propiedades</span>
         </div>
         <div>
-          <span class="block font-bold text-xl text-gray-900">{{ isGuest ? 0 : 124 }}</span>
+          <span class="block font-bold text-xl text-gray-900">{{ isGuest ? 0 : userProperties.length * 12 }}</span>
           <span class="text-xs text-gray-400 uppercase tracking-wide">Vistas</span>
         </div>
       </div>
@@ -68,6 +72,11 @@ const handleAuthAction = () => {
           :class="!isLogin ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
         >Registrarse</button>
       </div>
+      
+      <!-- Placeholder Button: Términos y condiciones -->
+      <button class="w-full bg-gray-50 text-gray-500 font-bold py-2.5 rounded-xl border border-dashed border-gray-200 mb-6 text-xs uppercase tracking-widest hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
+          <FileText :size="14" /> Términos y condiciones
+      </button>
 
       <transition name="fade-slide" mode="out-in">
         <form :key="isLogin ? 'login' : 'register'" @submit.prevent="handleAuthAction" class="space-y-4">
@@ -127,8 +136,22 @@ const handleAuthAction = () => {
 
     <!-- Logged In Actions -->
     <div v-else class="space-y-4">
-        <button class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-2xl shadow-sm hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+        <button @click="router.push('/add')" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-2xl shadow-sm hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
             Gestionar mis propiedades
+        </button>
+        
+        <button class="w-full bg-white border border-gray-200 text-gray-500 font-bold py-3 px-4 rounded-xl text-sm hover:bg-gray-50 transition-all flex items-center justify-between group">
+            <div class="flex items-center gap-3">
+               <FileText :size="18" class="text-gray-400" />
+               <span>Términos y condiciones</span>
+            </div>
+        </button>
+
+        <button class="w-full bg-white border border-gray-200 text-gray-500 font-bold py-3 px-4 rounded-xl text-sm hover:bg-gray-50 transition-all flex items-center justify-between group">
+            <div class="flex items-center gap-3">
+               <Settings :size="18" class="text-gray-400" />
+               <span>Configuración de la cuenta</span>
+            </div>
         </button>
         <button @click="logout" class="w-full bg-gray-100 text-gray-600 font-bold py-3.5 rounded-2xl hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
             <LogOut :size="18" /> Cerrar Sesión

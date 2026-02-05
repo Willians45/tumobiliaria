@@ -1,5 +1,6 @@
 import { ref, watch, computed } from 'vue';
 import propertiesData from '../assets/properties.json';
+import { usePropertyStorage } from './usePropertyStorage';
 
 const favorites = ref(JSON.parse(localStorage.getItem('favorites') || '[]'));
 
@@ -25,7 +26,12 @@ export function useFavorites() {
 
     // Get full property objects for the favorites list
     const favoriteProperties = computed(() => {
-        return propertiesData.filter(p => favorites.value.includes(p.id));
+        const { userProperties } = usePropertyStorage();
+        const allAvailableProperties = [...userProperties.value, ...propertiesData];
+
+        return allAvailableProperties.filter(p =>
+            favorites.value.some(favId => String(favId) === String(p.id))
+        );
     });
 
     return {

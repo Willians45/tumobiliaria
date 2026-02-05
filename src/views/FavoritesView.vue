@@ -7,7 +7,7 @@ const { favoriteProperties } = useFavorites();
 </script>
 
 <template>
-  <div class="pt-20 pb-24 px-4 min-h-screen">
+  <div class="pt-24 pb-24 px-4 min-h-screen">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Mis Favoritos</h1>
     
     <div v-if="favoriteProperties.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LControl } from "@vue-leaflet/vue-leaflet";
-import { Locate, Star, X, Heart } from 'lucide-vue-next';
+import { Locate, Star, X, Heart, LocateFixed, Loader2 } from 'lucide-vue-next';
 import { useFavorites } from '../composables/useFavorites';
+import { usePropertyStorage } from '../composables/usePropertyStorage';
+import { useAuth } from '../composables/useAuth';
 
 // Fix for missing marker icons in Leaflet + Vite
 import L from 'leaflet';
@@ -23,26 +25,46 @@ const props = defineProps({
   properties: {
     type: Array,
     default: () => []
+  },
+  height: {
+    type: String,
+    default: 'h-[45vh]'
   }
 });
 
 const router = useRouter();
+const route = useRoute(); // Added
 const { toggleFavorite, isFavorite } = useFavorites();
+const { userProperties, loadProperties } = usePropertyStorage();
+const { currentUser, isGuest } = useAuth();
+
 const zoom = ref(13);
 const center = ref([10.205, -64.695]); // Default Lechería
 const mapRef = ref(null);
 const selectedProperty = ref(null);
+const isLocating = ref(false);
+
+onMounted(() => { // Added
+  loadProperties(); // Ensure user properties are fresh
+});
+
+const allProperties = computed(() => { // Renamed from 'properties' to avoid conflict with props
+  return [...userProperties.value, ...props.properties];
+});
 
 const locateUser = () => {
   if (navigator.geolocation) {
+    isLocating.value = true;
     navigator.geolocation.getCurrentPosition(
       (position) => {
         center.value = [position.coords.latitude, position.coords.longitude];
         zoom.value = 15;
+        isLocating.value = false;
       },
       (error) => {
         console.error("Error getting location:", error);
         alert("No se pudo obtener tu ubicación.");
+        isLocating.value = false;
       }
     );
   }
@@ -79,10 +101,15 @@ const navigateToProperty = () => {
     router.push({ name: 'property-details', params: { id: selectedProperty.value.id } });
   }
 };
+
+const selectedPropertyImage = computed(() => {
+  if (!selectedProperty.value) return '';
+  return selectedProperty.value.image || (selectedProperty.value.images && selectedProperty.value.images.length > 0 ? selectedProperty.value.images[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=400');
+});
 </script>
 
 <template>
-  <div class="relative h-[65vh] w-full rounded-b-3xl overflow-hidden shadow-lg z-0">
+  <div :class="[height, 'relative w-full overflow-hidden shadow-sm z-0']">
     <l-map ref="mapRef" v-model:zoom="zoom" v-model:center="center" :use-global-leaflet="false" @click="closeCard">
       <l-tile-layer
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
@@ -93,7 +120,7 @@ const navigateToProperty = () => {
 
       <!-- Custom Price Markers -->
       <l-marker 
-        v-for="property in properties" 
+        v-for="property in allProperties" 
         :key="property.id" 
         :lat-lng="[property.location.lat, property.location.lng]"
         :icon="createPriceMarker(property)"
@@ -101,8 +128,13 @@ const navigateToProperty = () => {
       />
       
       <l-control position="topright">
-         <button @click.stop="locateUser" class="bg-white p-2 rounded-lg shadow-md hover:bg-gray-100 transition-colors">
-            <Locate :size="20" class="text-gray-700" />
+         <button 
+           @click.stop="locateUser" 
+           class="p-2.5 bg-white rounded-xl shadow-lg border border-gray-100 text-rose-500 hover:bg-rose-50 transition-all active:scale-95 flex items-center justify-center group"
+           :disabled="isLocating"
+         >
+            <LocateFixed v-if="!isLocating" :size="20" />
+            <Loader2 v-else :size="20" class="animate-spin text-gray-400" />
          </button>
       </l-control>
     </l-map>
@@ -119,12 +151,16 @@ const navigateToProperty = () => {
       <div v-if="selectedProperty" class="absolute bottom-6 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white rounded-2xl shadow-xl z-[1000] overflow-hidden cursor-pointer" @click="navigateToProperty">
         <div class="flex h-28">
            <!-- Image -->
-           <div class="w-28 h-full bg-gray-200 relative">
-             <img :src="selectedProperty.image" :alt="selectedProperty.title" class="w-full h-full object-cover" />
-             <button @click.stop="toggleFavorite(selectedProperty.id)" class="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white text-gray-500 backdrop-blur-sm transition-colors z-10">
-                <Heart :size="14" :class="{ 'fill-red-500 text-red-500': isFavorite(selectedProperty.id) }" v-if="isFavorite" />
-                <!-- Icon logic handled by Heart component if we import it, or just generic logic. Adding Heart import manually above if missing -->
-             </button>
+            <div class="w-28 h-full bg-gray-100 relative">
+              <img 
+                :key="selectedProperty.id"
+                :src="selectedPropertyImage" 
+                :alt="selectedProperty.title" 
+                class="w-full h-full object-cover" 
+              />
+              <button v-if="isGuest || (!userProperties.some(p => String(p.id) === String(selectedProperty.id)) && !(selectedProperty.uploader?.name === currentUser?.name))" @click.stop="toggleFavorite(selectedProperty.id)" class="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white text-gray-500 backdrop-blur-sm transition-colors z-10">
+                <Heart :size="14" :class="{ 'fill-rose-500 text-rose-500': isFavorite(selectedProperty.id) }" />
+              </button>
            </div>
            
            <!-- Content -->

@@ -5,6 +5,7 @@ import { MapPin, Bed, Bath, Square, User, Car, Warehouse, ArrowLeft, Star, Heart
 import propertiesData from '../assets/properties.json';
 import { useFavorites } from '../composables/useFavorites';
 import { useAuth } from '../composables/useAuth';
+import { usePropertyStorage } from '../composables/usePropertyStorage';
 
 const route = useRoute();
 const router = useRouter();
@@ -12,6 +13,7 @@ const property = ref(null);
 const currentImageIndex = ref(0);
 const { toggleFavorite, isFavorite } = useFavorites();
 const { currentUser, isGuest, loginAsTestUser } = useAuth();
+const { userProperties } = usePropertyStorage();
 
 const userRating = ref(0);
 const hoverRating = ref(0);
@@ -32,8 +34,17 @@ const propertyImages = computed(() => {
 
 onMounted(() => {
   window.scrollTo(0, 0); // Scroll to top
-  const id = parseInt(route.params.id);
-  property.value = propertiesData.find(p => p.id === id);
+  const id = route.params.id; // Keep as string to match both types
+  
+  // Try to find in user properties first
+  let found = userProperties.value.find(p => String(p.id) === String(id));
+  
+  // If not found, look in default static data
+  if (!found) {
+    found = propertiesData.find(p => String(p.id) === String(id));
+  }
+  
+  property.value = found;
 });
 
 const goBack = () => {
@@ -174,9 +185,9 @@ const shareProperty = async () => {
              <button @click="shareProperty" class="bg-white/90 backdrop-blur hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm transition-all flex items-center gap-2">
                 <Share2 :size="16" /> Compartir
              </button>
-             <button @click="toggleFavorite(property.id)" class="bg-white/90 backdrop-blur hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm transition-all flex items-center gap-2" :class="{ 'text-red-500': isFavorite(property.id) }">
+              <button v-if="isGuest || (!userProperties.some(p => String(p.id) === String(property.id)) && !(property.uploader?.name === currentUser?.name))" @click="toggleFavorite(property.id)" class="bg-white/90 backdrop-blur hover:bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm transition-all flex items-center gap-2" :class="{ 'text-red-500': isFavorite(property.id) }">
                 <Heart :size="16" :class="{ 'fill-current': isFavorite(property.id) }" /> Guardar
-             </button>
+              </button>
           </div>
         </div>
         
@@ -199,7 +210,7 @@ const shareProperty = async () => {
             <button @click="shareProperty" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2">
                 <Share2 :size="18" /> Compartir
             </button>
-            <button @click="toggleFavorite(property.id)" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2" :class="{ 'text-red-600 border-red-100 bg-red-50': isFavorite(property.id) }">
+            <button v-if="isGuest || (!userProperties.some(p => String(p.id) === String(property.id)) && !(property.uploader?.name === currentUser?.name))" @click="toggleFavorite(property.id)" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2" :class="{ 'text-red-600 border-red-100 bg-red-50': isFavorite(property.id) }">
                 <Heart :size="18" :class="{ 'fill-current': isFavorite(property.id) }" /> Guardar
             </button>
         </div>
@@ -272,11 +283,8 @@ const shareProperty = async () => {
         <!-- Description -->
         <div class="bg-white px-5 py-6 md:rounded-3xl md:shadow-sm md:border md:border-gray-100">
             <h2 class="text-lg font-bold text-gray-900 mb-3">Descripción</h2>
-            <p class="text-gray-600 leading-relaxed text-sm md:text-base">
-                Disfruta de una experiencia única en esta propiedad exclusiva. 
-                Perfectamente ubicada cerca de todo lo que necesitas, con acabados de primera y diseñada para el confort.
-                Ideal para quienes buscan calidad de vida y tranquilidad en una zona privilegiada.
-                Cuenta con todas las comodidades modernas, espacios amplios y luminosos.
+            <p class="text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-wrap">
+                {{ property.description || 'Disfruta de una experiencia única en esta propiedad exclusiva. Perfectamente ubicada cerca de todo lo que necesitas, con acabados de primera y diseñada para el confort. Ideal para quienes buscan calidad de vida y tranquilidad en una zona privilegiada.' }}
             </p>
         </div>
 
@@ -372,11 +380,8 @@ const shareProperty = async () => {
                  Contacta al anfitrión para agendar una visita o solicitar más información.
              </p>
 
-            <button disabled class="w-full bg-gray-200 text-gray-400 py-3.5 rounded-xl font-bold cursor-not-allowed flex items-center justify-center gap-2 mb-3">
+            <button disabled class="w-full bg-gray-200 text-gray-400 py-3.5 rounded-xl font-bold cursor-not-allowed flex items-center justify-center gap-2">
                 Consultar Disponibilidad
-            </button>
-            <button disabled class="w-full border border-gray-200 text-gray-400 py-3.5 rounded-xl font-bold cursor-not-allowed hover:bg-gray-50">
-                Chat con {{ property.uploader.name.split(' ')[0] }}
             </button>
             
             <p class="text-center text-xs text-gray-400 mt-4">

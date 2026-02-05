@@ -67,7 +67,7 @@ const plans = [
 </script>
 
 <template>
-  <div class="pt-6 pb-24 px-4 min-h-screen bg-white">
+  <div class="pt-24 pb-24 px-4 min-h-screen bg-white">
     <!-- Header -->
     <div class="flex items-center gap-4 mb-10">
       <button @click="goBack" class="p-2 bg-gray-50 rounded-full text-gray-700 hover:bg-gray-100 transition-all">

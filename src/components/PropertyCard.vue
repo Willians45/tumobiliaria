@@ -1,8 +1,11 @@
 <script setup>
 import { Heart, Star } from 'lucide-vue-next';
 import { useFavorites } from '../composables/useFavorites';
+import { usePropertyStorage } from '../composables/usePropertyStorage';
+import { useAuth } from '../composables/useAuth';
+import { computed } from 'vue';
 
-defineProps({
+const props = defineProps({
   property: {
     type: Object,
     required: true
@@ -10,6 +13,15 @@ defineProps({
 });
 
 const { toggleFavorite, isFavorite } = useFavorites();
+const { userProperties } = usePropertyStorage();
+const { currentUser, isGuest } = useAuth();
+
+const isUserProperty = computed(() => {
+  if (isGuest.value) return false;
+  const inStorage = userProperties.value.some(p => String(p.id) === String(props.property.id));
+  const isMine = props.property.uploader?.name === currentUser.value?.name;
+  return inStorage || isMine;
+});
 
 const handleLike = (e, id) => {
   e.preventDefault();
@@ -23,10 +35,11 @@ const handleLike = (e, id) => {
     <div class="bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col group cursor-pointer w-full">
       <!-- Image Section -->
       <div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-gray-100 flex-shrink-0">
-        <img :src="property.image" :alt="property.title" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+        <img :src="property.image || property.images?.[0]" :alt="property.title" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         
         <!-- Favorite Button -->
         <button 
+          v-if="!isUserProperty"
           @click="(e) => handleLike(e, property.id)"
           class="absolute top-3 right-3 p-2 rounded-full transition-all duration-300 z-10"
           :class="isFavorite(property.id) ? 'bg-red-50 text-red-500 scale-110' : 'bg-black/20 text-white hover:bg-white hover:text-red-500 hover:scale-110 backdrop-blur-sm'"
